@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Proyecto Español – Interactive Spanish Grammar</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-200: #bfdbfe;
+    --blue-300: #93c5fd; --blue-400: #60a5fa; --blue-500: #3b82f6;
+    --blue-600: #2563eb; --blue-700: #1d4ed8; --blue-800: #1e40af;
+    --blue-950: #172554;
+    --indigo-50: #eef2ff; --indigo-100: #e0e7ff; --indigo-300: #a5b4fc;
+    --indigo-500: #6366f1; --indigo-600: #4f46e5; --indigo-700: #4338ca;
+    --sky-50: #f0f9ff; --sky-100: #e0f2fe; --sky-300: #7dd3fc;
+    --sky-400: #38bdf8; --sky-500: #0ea5e9; --sky-700: #0369a1;
+    --cyan-400: #22d3ee;
+    --green-50: #f0fdf4; --green-100: #dcfce7; --green-200: #bbf7d0;
+    --green-400: #4ade80; --green-600: #16a34a; --green-700: #15803d; --green-800: #166534;
+    --red-50: #fef2f2; --red-100: #fee2e2; --red-200: #fecaca;
+    --red-400: #f87171; --red-600: #dc2626; --red-700: #b91c1c;
+    --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-500: #6b7280;
+    --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+    --white: #ffffff;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #eef2ff 100%);
+    min-height: 100vh;
+    color: var(--gray-800);
+  }
+
+  /* ── Navbar ── */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 12px rgba(37,99,235,.1);
+    border-bottom: 1px solid var(--blue-100);
+  }
+  .nav-inner {
+    max-width: 1024px; margin: 0 auto; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand { font-family: 'Fraunces', serif; font-weight: 900; color: var(--blue-700); font-size: 1.1rem; letter-spacing: -.02em; }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-btn {
+    padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: .85rem;
+    border: none; cursor: pointer; transition: all .2s;
+    color: var(--blue-700); background: transparent;
+  }
+  .nav-btn:hover { background: var(--blue-50); }
+  .nav-btn.active { background: var(--blue-600); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,.3); transform: scale(1.05); }
+  .hamburger { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--blue-700); }
+  .mobile-menu { display: none; padding: 0 16px 12px; flex-direction: column; gap: 6px; background: #fff; border-top: 1px solid var(--blue-100); }
+  .mobile-menu.open { display: flex; }
+  .mobile-btn {
+    width: 100%; text-align: left; padding: 12px 16px; border-radius: 12px;
+    font-weight: 600; font-size: .9rem; border: none; cursor: pointer;
+    color: var(--blue-700); background: transparent; transition: all .2s;
+  }
+  .mobile-btn:hover { background: var(--blue-50); }
+  .mobile-btn.active { background: var(--blue-600); color: #fff; }
+
+  /* ── Hero Banner ── */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500), var(--cyan-400));
+    color: #fff; text-align: center; padding: 56px 16px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 900; letter-spacing: -.03em; margin-bottom: 10px;
+  }
+  .hero p { color: var(--blue-100); font-size: 1.1rem; font-weight: 500; }
+  .hero-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
+  .hero-pill {
+    background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3);
+    color: #fff; padding: 8px 20px; border-radius: 999px;
+    font-weight: 600; font-size: .85rem; cursor: pointer;
+    transition: background .2s; backdrop-filter: blur(4px);
+  }
+  .hero-pill:hover { background: rgba(255,255,255,.3); }
+
+  /* ── Progress Pills ── */
+  .pills-bar { max-width: 1024px; margin: 0 auto; padding: 14px 16px; display: flex; gap: 8px; overflow-x: auto; }
+  .pill {
+    flex-shrink: 0; padding: 8px 18px; border-radius: 999px; font-size: .85rem;
+    font-weight: 600; border: 1px solid; cursor: pointer; transition: all .2s;
+    background: #fff; color: var(--blue-600); border-color: var(--blue-200);
+  }
+  .pill:hover { border-color: var(--blue-400); }
+  .pill.active { background: var(--blue-600); color: #fff; border-color: var(--blue-600); box-shadow: 0 2px 8px rgba(37,99,235,.25); }
+
+  /* ── Topic page ── */
+  .topic-page { max-width: 896px; margin: 0 auto; padding: 40px 16px; }
+
+  /* Hero card */
+  .topic-hero {
+    border-radius: 24px; padding: 32px; margin-bottom: 32px;
+    color: #fff; position: relative; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.15);
+  }
+  .topic-hero::before, .topic-hero::after {
+    content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.06);
+  }
+  .topic-hero::before { width: 160px; height: 160px; top: -40px; right: -40px; }
+  .topic-hero::after { width: 96px; height: 96px; bottom: -24px; left: -24px; }
+  .topic-hero h2 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3rem); font-weight: 900; letter-spacing: -.03em; margin-bottom: 6px; }
+  .topic-hero p { font-size: 1.1rem; font-weight: 500; opacity: .9; font-style: italic; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 12px; margin-bottom: 32px; }
+  .tab {
+    flex: 1; padding: 12px; border-radius: 16px; font-weight: 700; font-size: .9rem;
+    border: 1px solid; cursor: pointer; transition: all .2s;
+  }
+  .tab.inactive { background: #fff; }
+
+  /* Section heading */
+  .section-title { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; }
+
+  /* Intro card */
+  .intro-card { border-radius: 16px; padding: 24px; border: 1px solid; margin-bottom: 32px; }
+  .intro-card p { font-size: 1rem; line-height: 1.7; color: var(--gray-700); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; border-radius: 16px; box-shadow: 0 2px 12px rgba(37,99,235,.08); border: 1px solid var(--blue-100); margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  thead tr { background: linear-gradient(90deg, var(--blue-600), var(--blue-400)); }
+  thead th { padding: 12px 16px; text-align: left; color: #fff; font-weight: 600; letter-spacing: .04em; font-size: .8rem; text-transform: uppercase; }
+  tbody tr:nth-child(even) { background: var(--blue-50); }
+  tbody tr:nth-child(odd) { background: #fff; }
+  tbody td { padding: 12px 16px; }
+  tbody td:first-child { font-weight: 700; color: var(--blue-700); }
+  tbody td:nth-child(2) { color: var(--blue-600); font-weight: 600; }
+  tbody td:nth-child(3) { color: var(--gray-700); }
+
+  /* Uses */
+  .use-card { border-radius: 16px; padding: 20px; background: #fff; border: 1px solid; box-shadow: 0 1px 4px rgba(0,0,0,.04); margin-bottom: 10px; }
+  .use-title { font-weight: 700; margin-bottom: 4px; font-size: .95rem; }
+  .use-example { font-style: italic; font-size: .88rem; color: var(--gray-600); }
+
+  /* Irregular grid */
+  .irreg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-bottom: 24px; }
+  .irreg-card { border-radius: 14px; padding: 12px; text-align: center; border: 1px solid; }
+  .irreg-inf { font-size: .75rem; color: var(--gray-500); margin-bottom: 4px; }
+  .irreg-part { font-weight: 700; font-size: .9rem; }
+
+  /* Tip */
+  .tip-card { border-radius: 16px; padding: 20px; color: #fff; font-weight: 600; font-size: .95rem; line-height: 1.5; }
+
+  /* ── Quiz ── */
+  .quiz-wrap { border-radius: 24px; padding: 28px; border: 1px solid; }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .quiz-label { font-size: .875rem; font-weight: 700; }
+  .quiz-score-badge { font-size: .875rem; font-weight: 700; padding: 4px 14px; border-radius: 999px; }
+  .progress-bar { width: 100%; background: var(--gray-200); border-radius: 999px; height: 8px; margin-bottom: 24px; }
+  .progress-fill { height: 8px; border-radius: 999px; transition: width .5s ease; }
+  .quiz-question { font-size: 1.2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 24px; line-height: 1.4; }
+  .opt-btn {
+    display: block; width: 100%; text-align: left; padding: 16px 20px;
+    border-radius: 16px; border: 2px solid var(--gray-200); background: #fff;
+    font-family: inherit; font-size: .95rem; font-weight: 500; cursor: pointer;
+    transition: all .2s; margin-bottom: 10px;
+  }
+  .opt-btn:hover { border-color: var(--blue-400); background: var(--blue-50); }
+  .opt-btn.correct { border-color: var(--green-400); background: var(--green-50); color: var(--green-800); }
+  .opt-btn.wrong { border-color: var(--red-400); background: var(--red-50); color: var(--red-700); }
+  .opt-btn.disabled { border-color: var(--gray-200); opacity: .45; cursor: default; }
+  .quiz-feedback { text-align: center; margin-top: 8px; }
+  .quiz-feedback p { font-weight: 600; margin-bottom: 12px; }
+  .correct-msg { color: var(--green-600); }
+  .wrong-msg { color: var(--red-600); }
+  .quiz-btn {
+    padding: 12px 32px; border-radius: 999px; border: none;
+    color: #fff; font-family: inherit; font-weight: 700; font-size: .95rem;
+    cursor: pointer; transition: opacity .2s; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .quiz-btn:hover { opacity: .88; }
+
+  /* Results */
+  .results-wrap { border-radius: 24px; padding: 32px; border: 1px solid; text-align: center; }
+  .results-emoji { font-size: 3.5rem; margin-bottom: 16px; }
+  .results-score { font-family: 'Fraunces', serif; font-size: 2.2rem; font-weight: 900; margin-bottom: 16px; }
+  .results-bar-wrap { width: 100%; max-width: 280px; margin: 0 auto 24px; background: var(--gray-200); border-radius: 999px; height: 14px; }
+  .results-bar-fill { height: 14px; border-radius: 999px; transition: width 1s ease; }
+  .results-msg { color: var(--gray-600); margin-bottom: 24px; }
+  .answer-row { border-radius: 14px; padding: 14px 16px; border: 1px solid; margin-bottom: 8px; text-align: left; }
+  .answer-row.ok { background: var(--green-50); border-color: var(--green-200); }
+  .answer-row.bad { background: var(--red-50); border-color: var(--red-200); }
+  .answer-q { font-size: .8rem; color: var(--gray-500); margin-bottom: 4px; }
+  .answer-chosen { font-size: .875rem; font-weight: 600; }
+  .answer-chosen.ok { color: var(--green-700); }
+  .answer-chosen.bad { color: var(--red-700); }
+  .answer-correct { font-size: .8rem; color: var(--green-700); margin-top: 4px; }
+  .answers-list { margin-bottom: 24px; }
+
+  /* ── Carousel ── */
+  .carousel { background: linear-gradient(135deg, #1e3a8a, #312e81); padding: 48px 16px; }
+  .carousel-title { text-align: center; color: var(--blue-200); font-weight: 900; font-size: 1rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 32px; font-family: 'Fraunces', serif; }
+  .carousel-inner { max-width: 640px; margin: 0 auto; }
+  .carousel-row { display: flex; align-items: center; gap: 16px; }
+  .carousel-arrow { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; transition: color .2s; padding: 8px; }
+  .carousel-arrow:hover { color: var(--blue-300); }
+  .carousel-text { flex: 1; text-align: center; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .carousel-es { font-family: 'Fraunces', serif; font-size: clamp(1.3rem,4vw,1.8rem); font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .carousel-en { color: var(--blue-200); font-style: italic; font-size: .95rem; }
+  .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+  .carousel-dot { width: 8px; height: 8px; border-radius: 999px; border: none; cursor: pointer; background: #3b4fa8; transition: all .3s; }
+  .carousel-dot.active { background: #fff; width: 24px; }
+
+  /* ── Footer ── */
+  footer { background: var(--blue-950); color: var(--blue-300); text-align: center; padding: 24px 16px; font-size: .875rem; }
+  footer p:first-child { font-weight: 600; font-family: 'Fraunces', serif; margin-bottom: 4px; font-size: 1rem; }
+  footer p:last-child { opacity: .55; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hamburger { display: block; }
+    .irreg-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+  }
+
+  /* ── Colour helpers per topic ── */
+  /* presente */
+  .th-presente .topic-hero { background: linear-gradient(135deg, var(--blue-500), var(--cyan-400)); }
+  .th-presente .section-title, .th-presente .quiz-label { color: var(--blue-700); }
+  .th-presente .intro-card { background: var(--blue-50); border-color: var(--blue-300); }
+  .th-presente .use-card { border-color: var(--blue-300); }
+  .th-presente .use-title { color: var(--blue-700); }
+  .th-presente .irreg-card { background: var(--blue-50); border-color: var(--blue-300); }
+  .th-presente .irreg-part { color: var(--blue-700); }
+  .th-presente .tip-card { background: linear-gradient(135deg, var(--blue-500), var(--cyan-400)); }
+  .th-presente .tab.active { background: var(--blue-500); color: #fff; border-color: var(--blue-500); }
+  .th-presente .tab.inactive { color: var(--blue-700); border-color: var(--blue-300); }
+  .th-presente .quiz-wrap { background: var(--blue-50); border-color: var(--blue-300); }
+  .th-presente .quiz-label { color: var(--blue-700); }
+  .th-presente .quiz-score-badge { background: var(--blue-100); color: var(--blue-800); }
+  .th-presente .progress-fill { background: var(--blue-500); }
+  .th-presente .quiz-btn { background: var(--blue-500); }
+  .th-presente .results-wrap { background: var(--blue-50); border-color: var(--blue-300); }
+  .th-presente .results-score { color: var(--blue-700); }
+  .th-presente .results-bar-fill { background: var(--blue-500); }
+
+  /* pasado */
+  .th-pasado .topic-hero { background: linear-gradient(135deg, var(--blue-700), var(--indigo-500)); }
+  .th-pasado .section-title, .th-pasado .quiz-label { color: var(--indigo-700); }
+  .th-pasado .intro-card { background: var(--indigo-50); border-color: var(--indigo-300); }
+  .th-pasado .use-card { border-color: var(--indigo-300); }
+  .th-pasado .use-title { color: var(--indigo-700); }
+  .th-pasado .irreg-card { background: var(--indigo-50); border-color: var(--indigo-300); }
+  .th-pasado .irreg-part { color: var(--indigo-700); }
+  .th-pasado .tip-card { background: linear-gradient(135deg, var(--blue-700), var(--indigo-500)); }
+  .th-pasado .tab.active { background: var(--indigo-600); color: #fff; border-color: var(--indigo-600); }
+  .th-pasado .tab.inactive { color: var(--indigo-700); border-color: var(--indigo-300); }
+  .th-pasado .quiz-wrap { background: var(--indigo-50); border-color: var(--indigo-300); }
+  .th-pasado .quiz-score-badge { background: var(--indigo-100); color: var(--indigo-700); }
+  .th-pasado .progress-fill { background: var(--indigo-600); }
+  .th-pasado .quiz-btn { background: var(--indigo-600); }
+  .th-pasado .results-wrap { background: var(--indigo-50); border-color: var(--indigo-300); }
+  .th-pasado .results-score { color: var(--indigo-700); }
+  .th-pasado .results-bar-fill { background: var(--indigo-600); }
+
+  /* dimiaum */
+  .th-dimiaum .topic-hero { background: linear-gradient(135deg, var(--sky-400), var(--blue-400)); }
+  .th-dimiaum .section-title, .th-dimiaum .quiz-label { color: var(--sky-700); }
+  .th-dimiaum .intro-card { background: var(--sky-50); border-color: var(--sky-300); }
+  .th-dimiaum .use-card { border-color: var(--sky-300); }
+  .th-dimiaum .use-title { color: var(--sky-700); }
+  .th-dimiaum .irreg-card { background: var(--sky-50); border-color: var(--sky-300); }
+  .th-dimiaum .irreg-part { color: var(--sky-700); }
+  .th-dimiaum .tip-card { background: linear-gradient(135deg, var(--sky-400), var(--blue-400)); }
+  .th-dimiaum .tab.active { background: var(--sky-500); color: #fff; border-color: var(--sky-500); }
+  .th-dimiaum .tab.inactive { color: var(--sky-700); border-color: var(--sky-300); }
+  .th-dimiaum .quiz-wrap { background: var(--sky-50); border-color: var(--sky-300); }
+  .th-dimiaum .quiz-score-badge { background: var(--sky-100); color: var(--sky-700); }
+  .th-dimiaum .progress-fill { background: var(--sky-500); }
+  .th-dimiaum .quiz-btn { background: var(--sky-500); }
+  .th-dimiaum .results-wrap { background: var(--sky-50); border-color: var(--sky-300); }
+  .th-dimiaum .results-score { color: var(--sky-700); }
+  .th-dimiaum .results-bar-fill { background: var(--sky-500); }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">Proyecto Español</span>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-btn active" onclick="navigate('presente')">Presente Perfecto</button>
+      <button class="nav-btn" onclick="navigate('pasado')">Pasado Perfecto</button>
+      <button class="nav-btn" onclick="navigate('dimiaum')">Diminutivos &amp; Aumentativos</button>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-btn active" onclick="navigate('presente')">Presente Perfecto</button>
+    <button class="mobile-btn" onclick="navigate('pasado')">Pasado Perfecto</button>
+    <button class="mobile-btn" onclick="navigate('dimiaum')">Diminutivos &amp; Aumentativos</button>
+  </div>
+</nav>
+
+<!-- Hero Banner -->
+<div class="hero">
+  <div style="max-width:768px;margin:0 auto;">
+    <h1>Learn Spanish Grammar</h1>
+    <p>Master Presente Perfecto, Pasado Perfecto &amp; Diminutivos — then test your skills!</p>
+    <div class="hero-pills">
+      <button class="hero-pill" onclick="navigate('presente')">Presente Perfecto</button>
+      <button class="hero-pill" onclick="navigate('pasado')">Pasado Perfecto</button>
+      <button class="hero-pill" onclick="navigate('dimiaum')">Diminutivos &amp; Aumentativos</button>
+    </div>
+  </div>
+</div>
+
+<!-- Progress Pills -->
+<div class="pills-bar" id="pillsBar">
+  <button class="pill active" onclick="navigate('presente')">Presente Perfecto</button>
+  <button class="pill" onclick="navigate('pasado')">Pasado Perfecto</button>
+  <button class="pill" onclick="navigate('dimiaum')">Diminutivos &amp; Aumentativos</button>
+</div>
+
+<!-- Topic Content -->
+<main id="main"></main>
+
+<!-- Carousel -->
+<div class="carousel">
+  <p class="carousel-title">Example Phrases</p>
+  <div class="carousel-inner">
+    <div class="carousel-row">
+      <button class="carousel-arrow" onclick="carouselGo(-1)">◀</button>
+      <div class="carousel-text" id="carouselText"></div>
+      <button class="carousel-arrow" onclick="carouselGo(1)">▶</button>
+    </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>Proyecto Español</p>
+  <p>Interactive Spanish Grammar Study Guide · ¡Buena suerte!</p>
+</footer>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+
+const CONTENT = {
+  presente: {
+    thClass: 'th-presente',
+    title: 'Presente Perfecto',
+    subtitle: 'Has estudiado, has comido, has vivido…',
+    intro: "The Presente Perfecto (Present Perfect) describes actions that happened in the past but have relevance or connection to the present. It's formed with the present tense of 'haber' + past participle.",
+    tableHeaders: ['Pronoun', 'Auxiliary (haber)', 'Participle example'],
+    tableRows: [
+      ['yo', 'he', 'hablado / comido / vivido'],
+      ['tú', 'has', 'hablado / comido / vivido'],
+      ['él/ella', 'ha', 'hablado / comido / vivido'],
+      ['nosotros', 'hemos', 'hablado / comido / vivido'],
+      ['vosotros', 'habéis', 'hablado / comido / vivido'],
+      ['ellos/ellas', 'han', 'hablado / comido / vivido'],
+    ],
+    formationTitle: 'Formation: haber (present) + participio pasado',
+    uses: [
+      { title: 'Recent past with present relevance', example: 'He perdido mis llaves. (I have lost my keys — and still can\'t find them.)' },
+      { title: 'Experiences in life', example: '¿Has visitado España? (Have you visited Spain?)' },
+      { title: 'Actions just completed', example: 'Acaba de llegar / Ya he terminado. (I have just finished.)' },
+      { title: 'With time expressions: hoy, este mes, esta semana', example: 'Esta semana he trabajado mucho.' },
+    ],
+    irregular: [
+      ['abrir','abierto'],['decir','dicho'],['escribir','escrito'],
+      ['hacer','hecho'],['morir','muerto'],['poner','puesto'],
+      ['resolver','resuelto'],['romper','roto'],['ver','visto'],['volver','vuelto'],
+    ],
+    irregularTitle: 'Irregular Participles',
+    tip: 'Key signal words: ya, todavía no, alguna vez, nunca, recientemente, hoy, esta semana/mes/año.',
+  },
+  pasado: {
+    thClass: 'th-pasado',
+    title: 'Pasado Perfecto',
+    subtitle: 'Había estudiado, habías comido, habían vivido…',
+    intro: "The Pasado Perfecto (Past Perfect / Pluperfect) describes an action that was completed BEFORE another past action. It's formed with the imperfect of 'haber' + past participle.",
+    tableHeaders: ['Pronoun', 'Auxiliary (haber)', 'Participle example'],
+    tableRows: [
+      ['yo', 'había', 'hablado / comido / vivido'],
+      ['tú', 'habías', 'hablado / comido / vivido'],
+      ['él/ella', 'había', 'hablado / comido / vivido'],
+      ['nosotros', 'habíamos', 'hablado / comido / vivido'],
+      ['vosotros', 'habíais', 'hablado / comido / vivido'],
+      ['ellos/ellas', 'habían', 'hablado / comido / vivido'],
+    ],
+    formationTitle: 'Formation: haber (imperfect) + participio pasado',
+    uses: [
+      { title: 'Action before another past action', example: 'Cuando llegué, ya habían comido. (When I arrived, they had already eaten.)' },
+      { title: 'Reporting what someone had done', example: 'Dijo que había terminado. (He said he had finished.)' },
+      { title: 'Expressing regret about the past', example: 'Ojalá hubiera estudiado más. (I wish I had studied more.)' },
+      { title: 'With antes de que + subjunctive', example: 'Antes de que llegaras, ya habíamos salido.' },
+    ],
+    irregular: [
+      ['abrir','abierto'],['decir','dicho'],['escribir','escrito'],
+      ['hacer','hecho'],['morir','muerto'],['poner','puesto'],
+      ['resolver','resuelto'],['romper','roto'],['ver','visto'],['volver','vuelto'],
+    ],
+    irregularTitle: 'Irregular Participles',
+    tip: 'Key signal words: ya, antes de, cuando, después de que, todavía, apenas (barely/hardly).',
+  },
+  dimiaum: {
+    thClass: 'th-dimiaum',
+    title: 'Diminutivos & Aumentativos',
+    subtitle: 'Pequeñito, grandote, casita, perrazo…',
+    intro: 'Spanish uses suffixes to express size, affection, or intensity. Diminutivos make things smaller or cuter; Aumentativos make them bigger or more intense. These suffixes also carry emotional nuance.',
+    tableHeaders: ['Suffix', 'Example', 'Meaning'],
+    tableRows: [
+      ['Diminutivo -ito/a', 'casa → casita', 'small, cute, affectionate'],
+      ['Diminutivo -illo/a', 'pan → panecillo', 'small (less affective)'],
+      ['Diminutivo -ín/ina', 'pequeño → pequeñín', 'tiny, often affectionate'],
+      ['Aumentativo -ón/ona', 'hombre → hombrón', 'big, augmented'],
+      ['Aumentativo -azo/a', 'perro → perrazo', 'big, sometimes pejorative'],
+      ['Aumentativo -ote/a', 'grande → grandote', 'huge, informal'],
+    ],
+    formationTitle: 'Common Suffixes',
+    uses: [
+      { title: 'Expressing smallness or cuteness', example: '¡Qué perrito tan mono! (What a cute little dog!)' },
+      { title: 'Softening a request (diminutivo)', example: '¿Me das un momentito? (Could you give me just a moment?)' },
+      { title: 'Expressing large size (aumentativo)', example: 'Tiene una casona enorme. (He has a huge house.)' },
+      { title: 'Emotional intensification', example: '¡Qué golpazo! (What a huge hit!)' },
+    ],
+    irregular: [
+      ['poco','poquito'],['café','cafecito'],['viejo','viejecito'],
+      ['pez','pececito'],['luz','lucecita'],['grande','grandote'],
+      ['bueno','buenazo'],['malo','malote'],['lejos','lejísimos'],['cerca','cerquita'],
+    ],
+    irregularTitle: 'Spelling Changes & Examples',
+    tip: 'Spelling changes: z→c (lápiz→lapicito), g→gu (amigo→amiguito), c→qu (banco→banquito).',
+  },
+};
+
+const QUESTIONS = {
+  presente: [
+    { q: 'She has written a letter.', a: 'Ha escrito una carta.', opts: ['Escribió una carta.','Ha escrito una carta.','Había escrito una carta.','Escribirá una carta.'] },
+    { q: 'We have never visited Paris.', a: 'Nunca hemos visitado París.', opts: ['Nunca visitamos París.','Nunca habíamos visitado París.','Nunca hemos visitado París.','Jamás visitaremos París.'] },
+    { q: 'Have you (tú) eaten sushi?', a: '¿Has comido sushi?', opts: ['¿Comiste sushi?','¿Has comido sushi?','¿Habías comido sushi?','¿Comerás sushi?'] },
+    { q: 'They have already left.', a: 'Ya han salido.', opts: ['Ya habían salido.','Ya salieron.','Ya han salido.','Ya habrán salido.'] },
+    { q: 'I have broken the window.', a: 'He roto la ventana.', opts: ['Rompí la ventana.','He roto la ventana.','Había roto la ventana.','Romperé la ventana.'] },
+  ],
+  pasado: [
+    { q: 'When I arrived, they had already left.', a: 'Cuando llegué, ya habían salido.', opts: ['Cuando llegué, ya salieron.','Cuando llegué, ya habían salido.','Cuando llegué, ya han salido.','Cuando llegaba, habían salido.'] },
+    { q: 'She said she had finished.', a: 'Dijo que había terminado.', opts: ['Dijo que terminó.','Dijo que ha terminado.','Dijo que había terminado.','Dijo que terminaría.'] },
+    { q: 'I had never seen that film.', a: 'Nunca había visto esa película.', opts: ['Nunca he visto esa película.','Nunca vi esa película.','Nunca había visto esa película.','Nunca veré esa película.'] },
+    { q: 'We had already eaten before they arrived.', a: 'Ya habíamos comido antes de que llegaran.', opts: ['Ya habíamos comido antes de que llegaran.','Ya comimos antes de que llegaran.','Ya hemos comido antes de que lleguen.','Comeríamos antes de que llegaran.'] },
+    { q: 'They had written the report.', a: 'Habían escrito el informe.', opts: ['Han escrito el informe.','Escribieron el informe.','Habían escrito el informe.','Habrán escrito el informe.'] },
+  ],
+  dimiaum: [
+    { q: "Which is the diminutive of 'casa'?", a: 'casita', opts: ['casaza','caserón','casita','casota'] },
+    { q: 'Which suffix means "big" or augments size?', a: '-ón/-ona', opts: ['-ito/-ita','-illo/-illa','-ón/-ona','-ín/-ina'] },
+    { q: 'Diminutive of "café" (spelling change)?', a: 'cafecito', opts: ['cafito','cafecito','cafeito','cafecillo'] },
+    { q: "What does 'perrazo' imply?", a: 'A big dog', opts: ['A tiny dog','A cute dog','A big dog','A sick dog'] },
+    { q: 'Diminutive of "lápiz" (spelling change)?', a: 'lapicito', opts: ['lápizito','lapicito','lapicillo','lapicín'] },
+  ],
+};
+
+const CAROUSEL_PHRASES = [
+  { es: 'He comido paella hoy.', en: 'I have eaten paella today.' },
+  { es: 'Cuando llegué, ya habían salido.', en: 'When I arrived, they had already left.' },
+  { es: '¡Qué casita tan bonita!', en: 'What a cute little house!' },
+  { es: '¿Has visitado México alguna vez?', en: 'Have you ever visited Mexico?' },
+  { es: 'Tenía un perrazo enorme.', en: 'He had a huge big dog.' },
+  { es: 'Nunca habían visto eso.', en: 'They had never seen that.' },
+  { es: 'Dame un momentito, por favor.', en: 'Give me just a moment, please.' },
+  { es: 'Ya hemos terminado el proyecto.', en: 'We have already finished the project.' },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────
+
+let activeTopic = 'presente';
+let activeTab = 'learn';   // 'learn' | 'quiz'
+let quizState = null;
+let carouselIdx = 0;
+let carouselTimer = null;
+
+// ── Navigation ────────────────────────────────────────────────────────────
+
+function navigate(topic) {
+  activeTopic = topic;
+  activeTab = 'learn';
+  quizState = null;
+  updateNavButtons();
+  renderMain();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateNavButtons() {
+  const topics = ['presente','pasado','dimiaum'];
+  const labels = ['Presente Perfecto','Pasado Perfecto','Diminutivos &amp; Aumentativos'];
+  // desktop
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', topics[i] === activeTopic);
+  });
+  // mobile
+  document.querySelectorAll('.mobile-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', topics[i] === activeTopic);
+  });
+  // pills
+  document.querySelectorAll('.pill').forEach((pill, i) => {
+    pill.classList.toggle('active', topics[i] === activeTopic);
+  });
+}
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+
+function renderMain() {
+  const main = document.getElementById('main');
+  const t = CONTENT[activeTopic];
+
+  if (activeTab === 'learn') {
+    main.innerHTML = renderLearnPage(t);
+  } else {
+    main.innerHTML = renderQuizPage(t);
+  }
+}
+
+function renderLearnPage(t) {
+  return `
+  <div class="topic-page ${t.thClass}">
+    <!-- Hero -->
+    <div class="topic-hero">
+      <h2>${t.title}</h2>
+      <p>${t.subtitle}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('learn')">Learn</button>
+      <button class="tab inactive" onclick="switchTab('quiz')">Quiz</button>
+    </div>
+
+    <!-- Intro -->
+    <div class="intro-card">
+      <p>${t.intro}</p>
+    </div>
+
+    <!-- Formation -->
+    <p class="section-title">${t.formationTitle}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>${t.tableHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${t.tableRows.map(row => `<tr>${row.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+
+    <!-- Uses -->
+    <p class="section-title">When to Use It</p>
+    ${t.uses.map(u => `
+      <div class="use-card">
+        <p class="use-title">${u.title}</p>
+        <p class="use-example">${u.example}</p>
+      </div>
+    `).join('')}
+
+    <!-- Irregular -->
+    <p class="section-title" style="margin-top:24px;">${t.irregularTitle}</p>
+    <div class="irreg-grid">
+      ${t.irregular.map(([inf, part]) => `
+        <div class="irreg-card">
+          <div class="irreg-inf">${inf}</div>
+          <div class="irreg-part">${part}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- Tip -->
+    <div class="tip-card">${t.tip}</div>
+  </div>`;
+}
+
+// ── Quiz State Machine ────────────────────────────────────────────────────
+
+function initQuiz() {
+  quizState = {
+    questions: QUESTIONS[activeTopic],
+    current: 0,
+    selected: null,
+    score: 0,
+    done: false,
+    answers: [],
+  };
+}
+
+function renderQuizPage(t) {
+  if (!quizState) initQuiz();
+  if (quizState.done) return renderResults(t);
+
+  const qs = quizState;
+  const q = qs.questions[qs.current];
+  const pct = Math.round((qs.current / qs.questions.length) * 100);
+
+  return `
+  <div class="topic-page ${t.thClass}">
+    <div class="topic-hero">
+      <h2>${t.title}</h2>
+      <p>${t.subtitle}</p>
+    </div>
+    <div class="tabs">
+      <button class="tab inactive" onclick="switchTab('learn')">Learn</button>
+      <button class="tab active" onclick="switchTab('quiz')">Quiz</button>
+    </div>
+    <div class="quiz-wrap">
+      <div class="quiz-meta">
+        <span class="quiz-label">Question ${qs.current + 1} of ${qs.questions.length}</span>
+        <span class="quiz-score-badge">Score: ${qs.score}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <p class="quiz-question">${q.q}</p>
+      <div id="opts">
+        ${q.opts.map(opt => `
+          <button class="opt-btn" onclick="chooseOpt(this, '${escQ(opt)}')">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="quizFeedback" style="display:none;"></div>
+    </div>
+  </div>`;
+}
+
+function escQ(s) { return s.replace(/'/g, "\\'"); }
+
+function chooseOpt(btn, opt) {
+  const qs = quizState;
+  if (qs.selected !== null) return;
+  qs.selected = opt;
+  const q = qs.questions[qs.current];
+  const correct = opt === q.a;
+  if (correct) qs.score++;
+  qs.answers.push({ q: q.q, chosen: opt, correct: q.a, isCorrect: correct });
+
+  // Style buttons
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    const bOpt = b.textContent;
+    if (bOpt === q.a) b.classList.add('correct');
+    else if (bOpt === opt) b.classList.add('wrong');
+    else b.classList.add('disabled');
+    b.onclick = null;
+  });
+
+  // Show feedback
+  const fb = document.getElementById('quizFeedback');
+  const isLast = qs.current + 1 >= qs.questions.length;
+  fb.style.display = '';
+  fb.innerHTML = `
+    <p class="${correct ? 'correct-msg' : 'wrong-msg'}">
+      ${correct ? '✅ ¡Correcto!' : `❌ Incorrect. Correct answer: ${q.a}`}
+    </p>
+    <button class="quiz-btn" onclick="nextQuestion()">${isLast ? 'See Results 🏆' : 'Next Question →'}</button>`;
+}
+
+function nextQuestion() {
+  const qs = quizState;
+  if (qs.current + 1 < qs.questions.length) {
+    qs.current++;
+    qs.selected = null;
+    renderMain();
+  } else {
+    qs.done = true;
+    renderMain();
+  }
+}
+
+function renderResults(t) {
+  const qs = quizState;
+  const pct = Math.round((qs.score / qs.questions.length) * 100);
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '📚';
+  const msg = pct === 100 ? 'Perfecto! Excellent work!'
+            : pct >= 80  ? 'Muy bien! Keep it up!'
+            : pct >= 60  ? 'Bien! A little more practice!'
+            : 'Ánimo! Review the lesson and try again!';
+
+  return `
+  <div class="topic-page ${t.thClass}">
+    <div class="topic-hero">
+      <h2>${t.title}</h2>
+      <p>${t.subtitle}</p>
+    </div>
+    <div class="tabs">
+      <button class="tab inactive" onclick="switchTab('learn')">Learn</button>
+      <button class="tab active" onclick="switchTab('quiz')">Quiz</button>
+    </div>
+    <div class="results-wrap">
+      <div class="results-emoji">${emoji}</div>
+      <p class="results-score">${qs.score}/${qs.questions.length} correct!</p>
+      <div class="results-bar-wrap"><div class="results-bar-fill" style="width:${pct}%"></div></div>
+      <p class="results-msg">${msg}</p>
+      <div class="answers-list">
+        ${qs.answers.map(a => `
+          <div class="answer-row ${a.isCorrect ? 'ok' : 'bad'}">
+            <p class="answer-q">Q: ${a.q}</p>
+            <p class="answer-chosen ${a.isCorrect ? 'ok' : 'bad'}">${a.isCorrect ? 'Correct: ' : 'Incorrect: '}${a.chosen}</p>
+            ${!a.isCorrect ? `<p class="answer-correct">Correct answer: ${a.correct}</p>` : ''}
+          </div>
+        `).join('')}
+      </div>
+      <button class="quiz-btn" onclick="resetQuiz()">Try Again</button>
+    </div>
+  </div>`;
+}
+
+function resetQuiz() {
+  initQuiz();
+  renderMain();
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  if (tab === 'quiz' && !quizState) initQuiz();
+  renderMain();
+}
+
+// ── Carousel ──────────────────────────────────────────────────────────────
+
+function renderCarousel() {
+  const p = CAROUSEL_PHRASES[carouselIdx];
+  document.getElementById('carouselText').innerHTML = `
+    <p class="carousel-es">${p.es}</p>
+    <p class="carousel-en">${p.en}</p>`;
+  const dots = document.getElementById('carouselDots');
+  dots.innerHTML = CAROUSEL_PHRASES.map((_, i) =>
+    `<button class="carousel-dot ${i === carouselIdx ? 'active' : ''}" onclick="carouselGoTo(${i})"></button>`
+  ).join('');
+}
+
+function carouselGo(dir) {
+  carouselIdx = (carouselIdx + dir + CAROUSEL_PHRASES.length) % CAROUSEL_PHRASES.length;
+  renderCarousel();
+  resetCarouselTimer();
+}
+
+function carouselGoTo(i) {
+  carouselIdx = i;
+  renderCarousel();
+  resetCarouselTimer();
+}
+
+function resetCarouselTimer() {
+  clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => {
+    carouselIdx = (carouselIdx + 1) % CAROUSEL_PHRASES.length;
+    renderCarousel();
+  }, 3000);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+
+renderMain();
+renderCarousel();
+resetCarouselTimer();
+</script>
+</body>
+</html>
